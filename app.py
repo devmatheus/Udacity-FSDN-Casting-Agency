@@ -2,13 +2,17 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
-from models import db_drop_and_create_all, setup_db, Actor, Movie
+from models import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, db_drop_and_create_all, setup_db, Actor, Movie
 from auth import AuthError, requires_auth
 
 def create_app(test_config=None):
   app = Flask(__name__)
+
+  app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+  app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
   setup_db(app)
   db_drop_and_create_all()
+  
   CORS(app)
 
   @app.after_request

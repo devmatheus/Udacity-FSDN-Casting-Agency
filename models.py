@@ -1,16 +1,20 @@
 import os
+from dotenv import load_dotenv
 from datetime import date
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, Date
 from flask_sqlalchemy import SQLAlchemy
+
+load_dotenv()
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
 SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@{}:{}/{}".format(
-    os.environ.get('DB_USER'),
-    os.environ.get('DB_PASSWORD'),
-    os.environ.get('DB_HOST'),
-    os.environ.get('DB_PORT'),
-    os.environ.get('DB_NAME')
+    os.environ.get('DATABASE_USER'),
+    os.environ.get('DATABASE_PASSWORD'),
+    os.environ.get('DATABASE_HOST'),
+    os.environ.get('DATABASE_PORT'),
+    os.environ.get('DATABASE_NAME')
 )
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 db = SQLAlchemy()
 
 def setup_db(app):
@@ -48,6 +52,10 @@ def db_drop_and_create_all():
     movie2.actors.append(john)
     movie2.actors.append(jane)
 
+movie_actor = db.Table('movie_actor',
+    db.Column('movie_id', db.Integer, db.ForeignKey('movie.id'), primary_key=True),
+    db.Column('actor_id', db.Integer, db.ForeignKey('actor.id'), primary_key=True)
+)
 
 # Actors
 class Actor(db.Model):
@@ -55,16 +63,36 @@ class Actor(db.Model):
     name = Column(String)
     bio = Column(String, nullable=True)
 
-    movies = db.relationship('Movie', secondary='movie_actor', backref=db.backref('actors', lazy=True))
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
 
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+    
 # Movies
 class Movie(db.Model):
     id = Column(Integer, primary_key=True)
     title = Column(String)
-    release_date = Column(date, nullable=True)
+    release_date = Column(Date, nullable=True)
 
     actors = db.relationship('Actor', secondary='movie_actor', backref=db.backref('movies', lazy=True))
 
     @property
     def start_time_formatted(self):
         return self.start_time.strftime('%d %B %Y %H:%M')
+
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()

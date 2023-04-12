@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
 from models import db_drop_and_create_all, setup_db, Actor, Movie
+from auth import AuthError, requires_auth
 
 def create_app(test_config=None):
   app = Flask(__name__)
@@ -84,6 +85,22 @@ def create_app(test_config=None):
   return app
 
 APP = create_app()
+
+# TODO: GET Actors - Returns a paginated list of actors (requires_auth('get:actors'))
+
+# TODO: GET Movies - Returns a paginated list of movies (requires_auth('get:movies'))
+
+# TODO: DELETE Actor - Deletes an actor (requires_auth('delete:actors'))
+
+# TODO: DELETE Movie - Deletes a movie (requires_auth('delete:movies'))
+
+# TODO: POST Actor - Creates an actor (requires_auth('post:actors'))
+
+# TODO: POST Movie - Creates a movie (requires_auth('post:movies'))
+
+# TODO: PATCH Actor - Updates an actor (requires_auth('patch:actors'))
+
+# TODO: PATCH Movie - Updates a movie (requires_auth('patch:movies'))
 
 if __name__ == '__main__':
     APP.run(host='0.0.0.0', port=8080, debug=True)

@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
+# TODO: Use .env file to store database path
 database_path = "postgresql://{}/{}".format('localhost:5432', 'capstone')
 db = SQLAlchemy()
 
@@ -14,6 +15,8 @@ def setup_db(app):
 def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
+
+    # TODO: Add some data to the database
 
 # Actors
 class Actor(db.Model):

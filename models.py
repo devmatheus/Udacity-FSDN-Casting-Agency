@@ -1,11 +1,16 @@
-from datetime import date
 import os
+from datetime import date
 from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
-# TODO: Use .env file to store database path
-database_path = "postgresql://{}/{}".format('localhost:5432', 'capstone')
+SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@{}:{}/{}".format(
+    os.environ.get('DB_USER'),
+    os.environ.get('DB_PASSWORD'),
+    os.environ.get('DB_HOST'),
+    os.environ.get('DB_PORT'),
+    os.environ.get('DB_NAME')
+)
 db = SQLAlchemy()
 
 def setup_db(app):
@@ -16,7 +21,33 @@ def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
 
-    # TODO: Add some data to the database
+    john = Actor(
+        name='John Doe',
+        bio='John Doe is an actor.'
+    )
+    john.insert()
+
+    jane = Actor(
+        name='Jane Doe',
+        bio='Jane Doe is an actor.'
+    )
+    jane.insert()
+
+    movie1 = Movie(
+        title='Movie 1',
+        release_date=date.today()
+    )
+    movie1.insert()
+    movie1.actors.append(john)
+
+    movie2 = Movie(
+        title='Movie 2',
+        release_date=date.today()
+    )
+    movie2.insert()
+    movie2.actors.append(john)
+    movie2.actors.append(jane)
+
 
 # Actors
 class Actor(db.Model):

@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, jsonify
+from flask import Flask, render_template, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
@@ -89,21 +89,156 @@ def create_app(test_config=None):
 
 APP = create_app()
 
-# TODO: GET Actors - Returns a paginated list of actors (requires_auth('get:actors'))
+#region Interface Endpoints
+@APP.route('/')
+def index():
+    return render_template('pages/home.html')
 
-# TODO: GET Movies - Returns a paginated list of movies (requires_auth('get:movies'))
+@APP.route('/actors')
+def actors():
+    return render_template('pages/actors.html')
 
-# TODO: DELETE Actor - Deletes an actor (requires_auth('delete:actors'))
+@APP.route('/movies')
+def movies():
+    return render_template('pages/movies.html')
 
-# TODO: DELETE Movie - Deletes a movie (requires_auth('delete:movies'))
+@APP.route('/movies/<int:movie_id>')
+def movie(movie_id):
+    return render_template('pages/movie.html', movie_id=movie_id)
 
-# TODO: POST Actor - Creates an actor (requires_auth('post:actors'))
+@APP.route('/actors/<int:actor_id>')
+def actor(actor_id):
+    return render_template('pages/actor.html', actor_id=actor_id)
 
-# TODO: POST Movie - Creates a movie (requires_auth('post:movies'))
+@APP.route('/movies/create')
+def create_movie_submission():
+    return render_template('forms/new_movie.html')
 
-# TODO: PATCH Actor - Updates an actor (requires_auth('patch:actors'))
+@APP.route('/actors/create')
+def create_actor_submission():
+    return render_template('forms/new_actor.html')
 
-# TODO: PATCH Movie - Updates a movie (requires_auth('patch:movies'))
+@APP.route('/movies/<int:movie_id>/edit')
+def edit_movie_submission(movie_id):
+    return render_template('forms/edit_movie.html', movie_id=movie_id)
+
+@APP.route('/actors/<int:actor_id>/edit')
+def edit_actor_submission(actor_id):
+    return render_template('forms/edit_actor.html', actor_id=actor_id)
+#endregion
+
+#region API Endpoints
+@APP.route('/api/actors', methods=['GET'])
+@requires_auth('get:actors')
+def get_actors(payload):
+    actors = Actor.query.all()
+    if len(actors) == 0:
+        abort(404)
+    return jsonify({
+        'success': True,
+        'actors': [actor.format() for actor in actors]
+    })
+
+@APP.route('/api/movies', methods=['GET'])
+@requires_auth('get:movies')
+def get_movies(payload):
+    movies = Movie.query.all()
+    if len(movies) == 0:
+        abort(404)
+    return jsonify({
+        'success': True,
+        'movies': [movie.format() for movie in movies]
+    })
+
+@APP.route('/api/actors/<int:actor_id>', methods=['DELETE'])
+@requires_auth('delete:actors')
+def delete_actor(payload, actor_id):
+    actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
+    if actor is None:
+        abort(404)
+    actor.delete()
+    return jsonify({
+        'success': True,
+        'delete': actor_id
+    })
+
+@APP.route('/api/movies/<int:movie_id>', methods=['DELETE'])
+@requires_auth('delete:movies')
+def delete_movie(payload, movie_id):
+    movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
+    if movie is None:
+        abort(404)
+    movie.delete()
+    return jsonify({
+        'success': True,
+        'delete': movie_id
+    })
+
+@APP.route('/api/actors', methods=['POST'])
+@requires_auth('create:actors')
+def create_actor(payload):
+    actor = Actor(
+        name=request.json.get('name'),
+        bio=request.json.get('bio')
+    )
+    actor.insert()
+    return jsonify({
+        'success': True,
+        'actors': [actor.format()]
+    })
+
+@APP.route('/api/movies', methods=['POST'])
+@requires_auth('create:movies')
+def create_movie(payload):
+    movie = Movie(
+        title=request.json.get('title'),
+        release_date=request.json.get('release_date')
+    )
+    movie.insert()
+    for actor_id in request.json.get('actors'):
+        actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
+        if actor is not None:
+            movie.actors.append(actor)
+    movie.update()
+    return jsonify({
+        'success': True,
+        'movies': [movie.format()]
+    })
+
+@APP.route('/api/actors/<int:actor_id>', methods=['PATCH'])
+@requires_auth('patch:actors')
+def update_actor(payload, actor_id):
+    actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
+    if actor is None:
+        abort(404)
+    actor.name = request.json.get('name', actor.name)
+    actor.bio = request.json.get('bio', actor.bio)
+    actor.update()
+    return jsonify({
+        'success': True,
+        'actors': [actor.format()]
+    })
+
+@APP.route('/api/movies/<int:movie_id>', methods=['PATCH'])
+@requires_auth('patch:movies')
+def update_movie(payload, movie_id):
+    movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
+    if movie is None:
+        abort(404)
+    movie.title = request.json.get('title', movie.title)
+    movie.release_date = request.json.get('release_date', movie.release_date)
+    if 'actors' in request.json:
+        movie.actors = []
+        for actor_id in request.json.get('actors'):
+            actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
+            if actor is not None:
+                movie.actors.append(actor)
+    movie.update()
+    return jsonify({
+        'success': True,
+        'movies': [movie.format()]
+    })
+#endregion
 
 if __name__ == '__main__':
     APP.run(host='0.0.0.0', port=8080, debug=True)

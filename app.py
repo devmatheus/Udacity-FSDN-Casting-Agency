@@ -102,29 +102,21 @@ def actors():
 def movies():
     return render_template('pages/movies.html')
 
-@APP.route('/movies/<int:movie_id>')
-def movie(movie_id):
-    return render_template('pages/movie.html', movie_id=movie_id)
-
-@APP.route('/actors/<int:actor_id>')
-def actor(actor_id):
-    return render_template('pages/actor.html', actor_id=actor_id)
-
 @APP.route('/movies/create')
 def create_movie_submission():
-    return render_template('forms/new_movie.html')
+    return render_template('forms/movie.html', action='Add')
 
 @APP.route('/actors/create')
 def create_actor_submission():
-    return render_template('forms/new_actor.html')
+    return render_template('forms/actor.html', action='Add')
 
 @APP.route('/movies/<int:movie_id>/edit')
 def edit_movie_submission(movie_id):
-    return render_template('forms/edit_movie.html', movie_id=movie_id)
+    return render_template('forms/movie.html', action='Edit')
 
 @APP.route('/actors/<int:actor_id>/edit')
 def edit_actor_submission(actor_id):
-    return render_template('forms/edit_actor.html', actor_id=actor_id)
+    return render_template('forms/actor.html', action='Edit')
 #endregion
 
 #region API Endpoints

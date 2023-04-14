@@ -1,10 +1,12 @@
+import { EntityCRUD } from './entity_crud.js';
+
 class ActorCRUD extends EntityCRUD {
-    constructor() {
-      super('actors', 'actor-form', 'actor-list', 'prev-actor-page', 'next-actor-page');
-    }
-  
-    display(actors) {
-      this.list.innerHTML = actors.map((actor) => `
+  constructor() {
+    super('actors', 'actor-form', 'actor-list', 'prev-actor-page', 'next-actor-page');
+  }
+
+  display(actors) {
+    this.list.innerHTML = actors.map((actor) => `
         <tr>
           <td>${actor.name}</td>
           <td>${actor.bio}</td>
@@ -14,13 +16,14 @@ class ActorCRUD extends EntityCRUD {
           </td>
         </tr>
       `).join('');
-    }
-  
-    getFormData() {
-      return {
-        name: document.getElementById('actor-name').value,
-        bio: document.getElementById('actor-bio').value
-      };
-    }
   }
-  
+
+  getFormData() {
+    return {
+      name: document.getElementById('actor-name').value,
+      bio: document.getElementById('actor-bio').value
+    };
+  }
+}
+
+export { ActorCRUD };

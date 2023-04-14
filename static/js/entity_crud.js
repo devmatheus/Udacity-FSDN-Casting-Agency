@@ -6,9 +6,19 @@ class EntityCRUD {
         this.prevPageButton = document.getElementById(prevPageId);
         this.nextPageButton = document.getElementById(nextPageId);
         this.page = 1;
-        this.form.addEventListener('submit', (event) => this.create(event));
-        this.prevPageButton.addEventListener('click', () => this.prevPage());
-        this.nextPageButton.addEventListener('click', () => this.nextPage());
+        
+        if (this.form) {
+            this.form.addEventListener('submit', (event) => this.create(event));
+        }
+
+        if (this.prevPageButton) {
+            this.prevPageButton.addEventListener('click', () => this.prevPage());
+        }
+
+        if (this.nextPageButton) {
+            this.nextPageButton.addEventListener('click', () => this.nextPage());
+        }
+        
         this.fetchAndDisplay();
     }
 
@@ -18,9 +28,9 @@ class EntityCRUD {
     }
 
     async fetchEntities() {
-        const response = await fetch(`/${this.entityName}?page=${this.page}`);
+        const response = await fetch(`/api/${this.entityName}?page=${this.page}`);
         const data = await response.json();
-        return data;
+        return data[this.entityName];
     }
 
     display(entities) {
@@ -30,7 +40,7 @@ class EntityCRUD {
     async create(event) {
         event.preventDefault();
         const formData = this.getFormData();
-        await fetch(`/${this.entityName}`, {
+        await fetch(`/api/${this.entityName}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -46,7 +56,7 @@ class EntityCRUD {
     }
 
     async update(entityId, updatedData) {
-        await fetch(`/${this.entityName}/${entityId}`, {
+        await fetch(`/api/${this.entityName}/${entityId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -57,7 +67,7 @@ class EntityCRUD {
     }
 
     async delete(entityId) {
-        await fetch(`/${this.entityName}/${entityId}`, {
+        await fetch(`/api/${this.entityName}/${entityId}`, {
             method: 'DELETE',
         });
         this.fetchAndDisplay();
@@ -81,3 +91,5 @@ class EntityCRUD {
         }
     }
 }
+
+export { EntityCRUD };

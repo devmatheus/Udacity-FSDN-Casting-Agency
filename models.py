@@ -73,6 +73,13 @@ class Actor(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'bio': self.bio
+        }
     
 # Movies
 class Movie(db.Model):
@@ -96,3 +103,11 @@ class Movie(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+    def format(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'release_date': self.release_date.strftime('%d %B %Y'),
+            'actors': [actor.format() for actor in self.actors]
+        }

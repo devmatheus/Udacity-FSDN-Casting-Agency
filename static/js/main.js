@@ -1,56 +1,57 @@
-import EntityCRUD from './entity_crud.js';
-import ActorCRUD from './actor_crud.js';
-import MovieCRUD from './movie_crud.js';
+import { getIdFromUrl } from './utils.js';
+import { ActorCRUD } from './actor_crud.js';
+import { MovieCRUD } from './movie_crud.js';
 
-const actorCRUD = new ActorCRUD();
-const movieCRUD = new MovieCRUD();
+function instantiateCRUDClasses() {
+    const currentPath = window.location.pathname;
 
-function getIdFromUrl(entity) {
-    const regex = new RegExp(`/${entity}/(\\d+)/edit`);
-    const match = window.location.pathname.match(regex);
-    return match ? parseInt(match[1], 10) : null;
+    if (currentPath.startsWith('/actors')) {
+        return new ActorCRUD();
+    } else if (currentPath.startsWith('/movies')) {
+        return new MovieCRUD();
+    }
+
+    return null;
 }
 
-const editActorId = getIdFromUrl('actors');
-if (editActorId) {
-    actorCRUD.edit(editActorId);
+const crudInstance = instantiateCRUDClasses();
+
+const editId = getIdFromUrl('actors') || getIdFromUrl('movies');
+if (editId) {
+    crudInstance.edit(editId);
 }
 
-const editMovieId = getIdFromUrl('movies');
-if (editMovieId) {
-    movieCRUD.edit(editMovieId);
+const form = document.getElementById('actor-form') || document.getElementById('movie-form');
+if (form) {
+    form.addEventListener('submit', crudInstance.save);
 }
 
-const actorForm = document.getElementById('actor-form');
-if (actorForm) {
-    actorForm.addEventListener('submit', actorCRUD.save);
-}
-
-const movieForm = document.getElementById('movie-form');
-if (movieForm) {
-    movieForm.addEventListener('submit', movieCRUD.save);
-}
-
-const deleteActorButtons = document.querySelectorAll('.delete-actor');
-if (deleteActorButtons) {
-    deleteActorButtons.forEach(button => {
-        button.addEventListener('click', actorCRUD.delete);
+const deleteButtons = document.querySelectorAll('.delete-actor,.delete-movie');
+if (deleteButtons) {
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', crudInstance.delete);
     });
 }
 
-const deleteMovieButtons = document.querySelectorAll('.delete-movie');
-if (deleteMovieButtons) {
-    deleteMovieButtons.forEach(button => {
-        button.addEventListener('click', movieCRUD.delete);
-    });
-}
-
-const actorTable = document.getElementById('actor-table');
+const actorTable = document.getElementById('actor-table') || document.getElementById('movie-table');
 if (actorTable) {
-    actorCRUD.list(actorTable);
+    crudInstance.list(actorTable);
 }
 
-const movieTable = document.getElementById('movie-table');
-if (movieTable) {
-    movieCRUD.list(movieTable);
+// ------------------ //
+
+function setActiveNavItem() {
+    const currentPath = window.location.pathname;
+    const navItems = document.querySelectorAll('.nav-link');
+
+    navItems.forEach((navItem) => {
+        const itemRoute = navItem.getAttribute('href');
+        if (currentPath == itemRoute) {
+            navItem.classList.add('active');
+        } else {
+            navItem.classList.remove('active');
+        }
+    });
 }
+
+setActiveNavItem();

@@ -100,7 +100,7 @@ APP = create_app()
 @APP.route('/')
 @requires_auth()
 def index(payload):
-    return render_template('pages/home.html', token = session.get('jwt_token'), permissions = payload['permissions'])
+    return render_template('pages/home.html', token = payload['token'], permissions = payload['permissions'])
 
 @APP.route('/actors')
 @requires_auth()
@@ -151,7 +151,8 @@ def login():
 @APP.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+
+    return redirect(f'https://{os.environ.get("AUTH0_DOMAIN")}/v2/logout?client_id={os.environ.get("AUTH0_CLIENT_ID")}&returnTo={os.environ.get("AUTH0_LOGOUT_CALLBACK_URL")}')
 
 @APP.route('/auth0-callback')
 def callback():
@@ -170,7 +171,7 @@ def callback():
     token_response = requests.post(token_url, json=token_payload, headers=token_headers)
     token_response.raise_for_status()
     tokens = token_response.json()
-
+    
     session['jwt_token'] = tokens['access_token']
 
     return redirect(url_for('index'))

@@ -10,7 +10,7 @@ from auth import AuthError, requires_auth
 
 def create_app(test_config=None):
   app = Flask(__name__)
-
+  app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
   app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
   app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
   setup_db(app)
@@ -99,39 +99,39 @@ APP = create_app()
 #region Interface Endpoints
 @APP.route('/')
 @requires_auth()
-def index():
+def index(payload):
     return render_template('pages/home.html')
 
 @APP.route('/actors')
 @requires_auth()
-def actors():
+def actors(payload):
     return render_template('pages/actors.html')
 
 @APP.route('/movies')
 @requires_auth()
-def movies():
+def movies(payload):
     return render_template('pages/movies.html')
 
 @APP.route('/movies/create')
 @requires_auth()
-def create_movie_submission():
+def create_movie_submission(payload):
     actors = Actor.query.order_by(Actor.name).all()
     return render_template('forms/movie.html', action='Add', actors=actors)
 
 @APP.route('/actors/create')
 @requires_auth()
-def create_actor_submission():
+def create_actor_submission(payload):
     return render_template('forms/actor.html', action='Add')
 
 @APP.route('/movies/<int:movie_id>/edit')
 @requires_auth()
-def edit_movie_submission(movie_id):
+def edit_movie_submission(payload, movie_id):
     actors = Actor.query.order_by(Actor.name).all()
     return render_template('forms/movie.html', action='Edit', actors=actors)
 
 @APP.route('/actors/<int:actor_id>/edit')
 @requires_auth()
-def edit_actor_submission(actor_id):
+def edit_actor_submission(payload, actor_id):
     return render_template('forms/actor.html', action='Edit')
 
 @APP.route('/login')
@@ -148,28 +148,32 @@ def login():
     url = f"{base_url}?{urlencode(params)}"
     return redirect(url)
 
+@APP.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 @APP.route('/auth0-callback')
 def callback():
     code = request.args.get('code')
     token_url = f'https://{os.environ.get("AUTH0_DOMAIN")}/oauth/token'
     token_payload = {
-        'grant_type': 'authorization_code',
+        'grant_type': 'client_credentials',
         'client_id': os.environ.get('AUTH0_CLIENT_ID'),
         'client_secret': os.environ.get('AUTH0_CLIENT_SECRET'),
         'code': code,
         'redirect_uri': os.environ.get('AUTH0_CALLBACK_URL'),
         'audience': os.environ.get('AUTH0_API_AUDIENCE')
     }
-    token_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    token_headers = {'Content-Type': 'application/json'}
 
-    token_response = requests.post(token_url, data=token_payload, headers=token_headers)
+    token_response = requests.post(token_url, json=token_payload, headers=token_headers)
     token_response.raise_for_status()
     tokens = token_response.json()
 
     session['jwt_token'] = tokens['access_token']
-    session['id_token'] = tokens['id_token']
 
-    return redirect(url_for('home'))
+    return redirect(url_for('index'))
 #endregion
 
 #region API Endpoints

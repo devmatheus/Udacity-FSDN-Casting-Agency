@@ -12,8 +12,7 @@ def create_app(test_config=None):
   app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
   setup_db(app)
 
-  # Uncomment the following line to initialize the database.
-  # db_drop_and_create_all()
+  db_drop_and_create_all()
   
   CORS(app)
 

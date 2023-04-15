@@ -216,8 +216,7 @@ def create_actor(payload):
     )
     actor.insert()
     return jsonify({
-        'success': True,
-        'actors': [actor.format()]
+        'success': True
     })
 
 @APP.route('/api/movies', methods=['POST'])
@@ -234,8 +233,7 @@ def create_movie(payload):
             movie.actors.append(actor)
     movie.update()
     return jsonify({
-        'success': True,
-        'movies': [movie.format()]
+        'success': True
     })
 
 @APP.route('/api/actors/<int:actor_id>', methods=['PATCH'])
@@ -248,8 +246,7 @@ def update_actor(payload, actor_id):
     actor.bio = request.json.get('bio', actor.bio)
     actor.update()
     return jsonify({
-        'success': True,
-        'actors': [actor.format()]
+        'success': True
     })
 
 @APP.route('/api/movies/<int:movie_id>', methods=['PATCH'])
@@ -268,8 +265,7 @@ def update_movie(payload, movie_id):
                 movie.actors.append(actor)
     movie.update()
     return jsonify({
-        'success': True,
-        'movies': [movie.format()]
+        'success': True
     })
 #endregion
 

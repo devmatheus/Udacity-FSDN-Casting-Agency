@@ -33,7 +33,7 @@ class ActorCRUD extends EntityCRUD {
           <td>${actor.bio}</td>
           <td>
             <button class="btn btn-sm btn-warning" onclick="crudInstance.edit(${actor.id})">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="crudInstance.delete(${actor.id})">Delete</button>
+            <button class="btn btn-sm btn-danger delete-button" onclick="crudInstance.delete(${actor.id})">Delete</button>
           </td>
         `;
       tbody.appendChild(tr);

@@ -15,7 +15,7 @@ class MovieCRUD extends EntityCRUD {
           <td>${movie.release_date_formatted}</td>
           <td>
             <button class="btn btn-sm btn-warning" onclick="crudInstance.edit(${movie.id})">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="crudInstance.delete(${movie.id})">Delete</button>
+            <button class="btn btn-sm btn-danger delete-button" onclick="crudInstance.delete(${movie.id})">Delete</button>
           </td>
         </tr>
       `).join('');

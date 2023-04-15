@@ -18,8 +18,12 @@
 
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+                {% if 'get:movies' not in permissions %}
                 <li class="nav-item"><a href="/actors" class="nav-link">Actors</a></li>
+                {% endif %}
+                {% if 'get:actors' not in permissions %}
                 <li class="nav-item"><a href="/movies" class="nav-link">Movies</a></li>
+                {% endif %}
             </ul>
         </header>
 

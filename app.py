@@ -100,39 +100,39 @@ APP = create_app()
 @APP.route('/')
 @requires_auth()
 def index(payload):
-    return render_template('pages/home.html', token = session.get('jwt_token'))
+    return render_template('pages/home.html', token = session.get('jwt_token'), permissions = payload['permissions'])
 
 @APP.route('/actors')
 @requires_auth()
 def actors(payload):
-    return render_template('pages/actors.html')
+    return render_template('pages/actors.html', permissions = payload['permissions'])
 
 @APP.route('/movies')
 @requires_auth()
 def movies(payload):
-    return render_template('pages/movies.html')
+    return render_template('pages/movies.html', permissions = payload['permissions'])
 
 @APP.route('/movies/create')
-@requires_auth()
+@requires_auth('create:movies')
 def create_movie_submission(payload):
     actors = Actor.query.order_by(Actor.name).all()
-    return render_template('forms/movie.html', action='Add', actors=actors)
+    return render_template('forms/movie.html', action='Add', actors=actors, permissions = payload['permissions'])
 
 @APP.route('/actors/create')
-@requires_auth()
+@requires_auth('create:actors')
 def create_actor_submission(payload):
-    return render_template('forms/actor.html', action='Add')
+    return render_template('forms/actor.html', action='Add', permissions = payload['permissions'])
 
 @APP.route('/movies/<int:movie_id>/edit')
-@requires_auth()
+@requires_auth('patch:movies')
 def edit_movie_submission(payload, movie_id):
     actors = Actor.query.order_by(Actor.name).all()
-    return render_template('forms/movie.html', action='Edit', actors=actors)
+    return render_template('forms/movie.html', action='Edit', actors=actors, permissions = payload['permissions'])
 
 @APP.route('/actors/<int:actor_id>/edit')
-@requires_auth()
+@requires_auth('patch:actors')
 def edit_actor_submission(payload, actor_id):
-    return render_template('forms/actor.html', action='Edit')
+    return render_template('forms/actor.html', action='Edit', permissions = payload['permissions'])
 
 @APP.route('/login')
 def login():

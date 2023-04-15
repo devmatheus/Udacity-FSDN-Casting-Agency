@@ -1,3 +1,4 @@
+cryptography=39.0.0
 Flask==1.0.2
 Flask_Cors==3.0.8
 Flask_SQLAlchemy==2.5.0

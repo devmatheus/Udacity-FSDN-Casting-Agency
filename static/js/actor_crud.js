@@ -8,13 +8,14 @@ class ActorCRUD extends EntityCRUD {
   display(actors) {
     if (!this.list) return;
 
-    this.list.innerHTML = actors.map((actor) => `
+    this.list.innerHTML = '<tr></tr><th>Name</th><th>Bio</th><th>Actions</th></tr>';
+    this.list.innerHTML += actors.map((actor) => `
         <tr>
           <td>${actor.name}</td>
           <td>${actor.bio}</td>
           <td>
-            <button onclick="crudInstance.edit(${actor.id})">Update</button>
-            <button onclick="crudInstance.delete(${actor.id})">Delete</button>
+            <button class="btn btn-sm btn-warning" onclick="crudInstance.edit(${actor.id})">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="crudInstance.delete(${actor.id})">Delete</button>
           </td>
         </tr>
       `).join('');

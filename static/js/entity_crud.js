@@ -109,10 +109,12 @@ class EntityCRUD {
     }
 
     async delete(entityId) {
-        await fetch(`/api/${this.entityName}/${entityId}`, {
-            method: 'DELETE',
-        });
-        this.fetchAndDisplay();
+        if (confirm("Are you sure you want to delete this item?")) {
+            await fetch(`/api/${this.entityName}/${entityId}`, {
+                method: 'DELETE',
+            });
+            this.fetchAndDisplay();
+        }
     }
 
     async nextPage() {

@@ -8,13 +8,14 @@ class MovieCRUD extends EntityCRUD {
   display(movies) {
     if (!this.list) return;
 
-    this.list.innerHTML = movies.map((movie) => `
+    this.list.innerHTML = '<tr></tr><th>Title</th><th>Release Date</th><th>Actions</th></tr>';
+    this.list.innerHTML += movies.map((movie) => `
         <tr>
           <td>${movie.title}</td>
-          <td>${movie.release_date}</td>
+          <td>${movie.release_date_formatted}</td>
           <td>
-            <button onclick="crudInstance.edit(${movie.id})">Edit</button>
-            <button onclick="crudInstance.delete(${movie.id})">Delete</button>
+            <button class="btn btn-sm btn-warning" onclick="crudInstance.edit(${movie.id})">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="crudInstance.delete(${movie.id})">Delete</button>
           </td>
         </tr>
       `).join('');

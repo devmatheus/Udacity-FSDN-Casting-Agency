@@ -18,6 +18,8 @@ window.crudInstance = instantiateCRUDClasses();
 
 // ------------------ //
 
+$('.select2').select2();
+
 function setActiveNavItem() {
     const currentPath = window.location.pathname;
     const navItems = document.querySelectorAll('.nav-link');

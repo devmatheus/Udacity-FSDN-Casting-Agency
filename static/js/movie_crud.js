@@ -21,10 +21,27 @@ class MovieCRUD extends EntityCRUD {
       `).join('');
   }
 
+  populateForm(item) {
+    super.populateForm(item);
+
+    if (this.form) {
+        const actorsSelect = document.getElementById('actors');
+        if (actorsSelect) {
+            const movieActorIds = item.actors.map((actor) => actor.id);
+            for (const option of actorsSelect.options) {
+                option.selected = movieActorIds.includes(parseInt(option.value));
+            }
+
+            $(actorsSelect).select2().trigger('change');
+        }
+    }
+}
+
   getFormData() {
     return {
       title: document.getElementById('title').value,
-      release_date: document.getElementById('release_date').value
+      release_date: document.getElementById('release_date').value,
+      actors: Array.from(document.getElementById('actors').selectedOptions).map(option => option.value)
     };
   }
 }

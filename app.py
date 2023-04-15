@@ -106,7 +106,8 @@ def movies():
 
 @APP.route('/movies/create')
 def create_movie_submission():
-    return render_template('forms/movie.html', action='Add')
+    actors = Actor.query.order_by(Actor.name).all()
+    return render_template('forms/movie.html', action='Add', actors=actors)
 
 @APP.route('/actors/create')
 def create_actor_submission():
@@ -114,7 +115,8 @@ def create_actor_submission():
 
 @APP.route('/movies/<int:movie_id>/edit')
 def edit_movie_submission(movie_id):
-    return render_template('forms/movie.html', action='Edit')
+    actors = Actor.query.order_by(Actor.name).all()
+    return render_template('forms/movie.html', action='Edit', actors=actors)
 
 @APP.route('/actors/<int:actor_id>/edit')
 def edit_actor_submission(actor_id):

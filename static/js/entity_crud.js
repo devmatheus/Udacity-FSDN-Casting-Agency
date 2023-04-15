@@ -36,14 +36,20 @@ class EntityCRUD {
     }
 
     async fetchAndDisplay() {
-        const entities = await this.fetchEntities();
+        const paginate = await this.paginate();
+        const entities = paginate[this.entityName];
         this.display(entities);
+        this.disablePaginationButtons(paginate);
+    }
+
+    async paginate() {
+        const response = await fetch(`/api/${this.entityName}?page=${this.page}`);
+        return await response.json();
     }
 
     async fetchEntities() {
-        const response = await fetch(`/api/${this.entityName}?page=${this.page}`);
-        const data = await response.json();
-        return data[this.entityName];
+        const paginate = await this.paginate();
+        return paginate[this.entityName];
     }
 
     async fetchEntity(entityId) {
@@ -119,9 +125,11 @@ class EntityCRUD {
 
     async nextPage() {
         this.page += 1;
-        const entities = await this.fetchEntities();
+        const paginate = await this.paginate();
+        const entities = paginate[this.entityName];
         if (entities.length > 0) {
             this.display(entities);
+            this.disablePaginationButtons(paginate);
         } else {
             this.page -= 1;
         }
@@ -130,8 +138,24 @@ class EntityCRUD {
     async prevPage() {
         if (this.page > 1) {
             this.page -= 1;
-            const entities = await this.fetchEntities();
+            const paginate = await this.paginate();
+            const entities = paginate[this.entityName];
             this.display(entities);
+            this.disablePaginationButtons(paginate);
+        }
+    }
+
+    disablePaginationButtons(paginate) {
+        if (this.page > 1) {
+            this.prevPageButton.removeAttribute('disabled');
+        } else {
+            this.prevPageButton.setAttribute('disabled', 'disabled');
+        }
+
+        if (this.page == paginate.total_pages) {
+            this.nextPageButton.setAttribute('disabled', 'disabled');
+        } else {
+            this.nextPageButton.removeAttribute('disabled');
         }
     }
 }

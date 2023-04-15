@@ -125,23 +125,38 @@ def edit_actor_submission(actor_id):
 @APP.route('/api/actors', methods=['GET'])
 @requires_auth('get:actors')
 def get_actors(payload):
-    actors = Actor.query.all()
-    if len(actors) == 0:
+    page = request.args.get('page', 1, type=int)
+    page_size = request.args.get('page_size', 10, type=int)
+
+    actors = Actor.query.paginate(page=page, per_page=page_size)
+
+    if actors.total == 0:
         abort(404)
+
     return jsonify({
         'success': True,
-        'actors': [actor.format() for actor in actors]
+        'actors': [actor.format() for actor in actors.items],
+        'total_actors': actors.total,
+        'current_page': actors.page,
+        'total_pages': actors.pages
     })
 
 @APP.route('/api/movies', methods=['GET'])
 @requires_auth('get:movies')
 def get_movies(payload):
-    movies = Movie.query.all()
-    if len(movies) == 0:
+    page = request.args.get('page', 1, type=int)
+    page_size = request.args.get('page_size', 10, type=int)
+
+    movies = Movie.query.paginate(page=page, per_page=page_size)
+    if movies.total == 0:
         abort(404)
+
     return jsonify({
         'success': True,
-        'movies': [movie.format() for movie in movies]
+        'movies': [movie.format() for movie in movies.items],
+        'total_movies': movies.total,
+        'current_page': movies.page,
+        'total_pages': movies.pages
     })
 
 @APP.route('/api/actors/<int:actor_id>', methods=['GET'])

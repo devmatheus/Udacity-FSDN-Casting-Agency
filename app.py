@@ -138,7 +138,7 @@ def edit_actor_submission(actor_id):
 def login():
     base_url = f'https://{os.environ.get("AUTH0_DOMAIN")}/authorize'
     params = {
-        'audience': os.environ.get('AUTH0_AUDIENCE'),
+        'audience': os.environ.get('AUTH0_API_AUDIENCE'),
         'response_type': 'code',
         'client_id': os.environ.get('AUTH0_CLIENT_ID'),
         'redirect_uri': os.environ.get('AUTH0_CALLBACK_URL'),
@@ -146,6 +146,7 @@ def login():
     }
 
     url = f"{base_url}?{urlencode(params)}"
+    return url
     return redirect(url)
 
 @APP.route('/auth0-callback')
@@ -158,7 +159,7 @@ def callback():
         'client_secret': os.environ.get('AUTH0_CLIENT_SECRET'),
         'code': code,
         'redirect_uri': os.environ.get('AUTH0_CALLBACK_URL'),
-        'audience': os.environ.get('AUTH0_AUDIENCE')
+        'audience': os.environ.get('AUTH0_API_AUDIENCE')
     }
     token_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 

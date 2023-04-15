@@ -43,7 +43,11 @@ class EntityCRUD {
     }
 
     async paginate() {
-        const response = await fetch(`/api/${this.entityName}?page=${this.page}`);
+        const response = await fetch(`/api/${this.entityName}?page=${this.page}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            },
+        });
         return await response.json();
     }
 
@@ -53,7 +57,11 @@ class EntityCRUD {
     }
 
     async fetchEntity(entityId) {
-        const response = await fetch(`/api/${this.entityName}/${entityId}`);
+        const response = await fetch(`/api/${this.entityName}/${entityId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            },
+        });
         const data = await response.json();
         return data;
     }
@@ -68,6 +76,7 @@ class EntityCRUD {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token'),
             },
             body: JSON.stringify(formData),
         });
@@ -108,6 +117,7 @@ class EntityCRUD {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token'),
             },
             body: JSON.stringify(updatedData),
         });
@@ -118,6 +128,9 @@ class EntityCRUD {
         if (confirm("Are you sure you want to delete this item?")) {
             await fetch(`/api/${this.entityName}/${entityId}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                },
             });
             this.fetchAndDisplay();
         }

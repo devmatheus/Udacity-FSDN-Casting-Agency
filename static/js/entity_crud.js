@@ -1,3 +1,5 @@
+import { getIdFromUrl } from './utils.js';
+
 class EntityCRUD {
     constructor(entityName, formId, listId, prevPageId, nextPageId) {
         this.entityName = entityName;
@@ -8,7 +10,7 @@ class EntityCRUD {
         this.page = 1;
 
         if (this.form) {
-            this.form.addEventListener('submit', (event) => this.create(event));
+            this.form.addEventListener('submit', (e) => crudInstance.save(e));
         }
 
         if (this.prevPageButton) {
@@ -19,7 +21,18 @@ class EntityCRUD {
             this.nextPageButton.addEventListener('click', () => this.nextPage());
         }
 
-        this.fetchAndDisplay();
+        const editId = getIdFromUrl(this.entityName);
+        if (editId) {
+            const ctrl = this;
+            this.fetchEntity(editId)
+                .then((entity) => {
+                    ctrl.populateForm(entity.data);
+                });
+        }
+
+        if (this.list) {
+            this.fetchAndDisplay();
+        }
     }
 
     async fetchAndDisplay() {
@@ -43,8 +56,7 @@ class EntityCRUD {
         // To be implemented in the specific entity class (e.g., ActorCRUD, MovieCRUD)
     }
 
-    async create(event) {
-        event.preventDefault();
+    async create() {
         const formData = this.getFormData();
         await fetch(`/api/${this.entityName}`, {
             method: 'POST',
@@ -54,7 +66,7 @@ class EntityCRUD {
             body: JSON.stringify(formData),
         });
         this.form.reset();
-        this.fetchAndDisplay();
+        window.location.href = `/${this.entityName}`;
     }
 
     getFormData() {
@@ -74,15 +86,26 @@ class EntityCRUD {
         }
     }
 
+    save(event) {
+        event.preventDefault();
+        const entityId = getIdFromUrl(this.entityName);
+        if (entityId) {
+            this.update(entityId, this.getFormData());
+        } else {
+            this.create();
+        }
+        return false;
+    }
+
     async update(entityId, updatedData) {
         await fetch(`/api/${this.entityName}/${entityId}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(updatedData),
         });
-        this.fetchAndDisplay();
+        window.location.href = `/${this.entityName}`;
     }
 
     async delete(entityId) {

@@ -16,32 +16,6 @@ function instantiateCRUDClasses() {
 
 window.crudInstance = instantiateCRUDClasses();
 
-const editId = getIdFromUrl('actors') || getIdFromUrl('movies');
-if (editId) {
-    crudInstance.fetchEntity(editId)
-    .then((entity) => {
-        crudInstance.populateForm(entity.data);
-    });
-        
-}
-
-const form = document.getElementById('actor-form') || document.getElementById('movie-form');
-if (form) {
-    form.addEventListener('submit', crudInstance.save);
-}
-
-const deleteButtons = document.querySelectorAll('.delete-actor,.delete-movie');
-if (deleteButtons) {
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', crudInstance.delete);
-    });
-}
-
-const table = document.getElementById('actor-table') || document.getElementById('movie-table');
-if (table) {
-    crudInstance.list(table);
-}
-
 // ------------------ //
 
 function setActiveNavItem() {

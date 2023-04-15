@@ -146,7 +146,6 @@ def login():
     }
 
     url = f"{base_url}?{urlencode(params)}"
-    return url
     return redirect(url)
 
 @APP.route('/auth0-callback')

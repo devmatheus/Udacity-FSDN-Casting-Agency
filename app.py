@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request, abort, jsonify
+import os
+import requests
+from flask import Flask, render_template, request, abort, jsonify, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from urllib.parse import urlencode
 
 from models import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, db_drop_and_create_all, setup_db, Actor, Movie
 from auth import AuthError, requires_auth
@@ -80,6 +83,9 @@ def create_app(test_config=None):
   
   @app.errorhandler(AuthError)
   def auth_error(error):
+      if not request.path.startswith('/api'):
+          return redirect(url_for('login'))
+      
       return jsonify({
           "success": False,
           "error": error.status_code,
@@ -92,34 +98,78 @@ APP = create_app()
 
 #region Interface Endpoints
 @APP.route('/')
+@requires_auth()
 def index():
     return render_template('pages/home.html')
 
 @APP.route('/actors')
+@requires_auth()
 def actors():
     return render_template('pages/actors.html')
 
 @APP.route('/movies')
+@requires_auth()
 def movies():
     return render_template('pages/movies.html')
 
 @APP.route('/movies/create')
+@requires_auth()
 def create_movie_submission():
     actors = Actor.query.order_by(Actor.name).all()
     return render_template('forms/movie.html', action='Add', actors=actors)
 
 @APP.route('/actors/create')
+@requires_auth()
 def create_actor_submission():
     return render_template('forms/actor.html', action='Add')
 
 @APP.route('/movies/<int:movie_id>/edit')
+@requires_auth()
 def edit_movie_submission(movie_id):
     actors = Actor.query.order_by(Actor.name).all()
     return render_template('forms/movie.html', action='Edit', actors=actors)
 
 @APP.route('/actors/<int:actor_id>/edit')
+@requires_auth()
 def edit_actor_submission(actor_id):
     return render_template('forms/actor.html', action='Edit')
+
+@APP.route('/login')
+def login():
+    base_url = f'https://{os.environ.get("AUTH0_DOMAIN")}/authorize'
+    params = {
+        'audience': os.environ.get('AUTH0_AUDIENCE'),
+        'response_type': 'code',
+        'client_id': os.environ.get('AUTH0_CLIENT_ID'),
+        'redirect_uri': os.environ.get('AUTH0_CALLBACK_URL'),
+        'scope': 'openid profile email'
+    }
+
+    url = f"{base_url}?{urlencode(params)}"
+    return redirect(url)
+
+@APP.route('/auth0-callback')
+def callback():
+    code = request.args.get('code')
+    token_url = f'https://{os.environ.get("AUTH0_DOMAIN")}/oauth/token'
+    token_payload = {
+        'grant_type': 'authorization_code',
+        'client_id': os.environ.get('AUTH0_CLIENT_ID'),
+        'client_secret': os.environ.get('AUTH0_CLIENT_SECRET'),
+        'code': code,
+        'redirect_uri': os.environ.get('AUTH0_CALLBACK_URL'),
+        'audience': os.environ.get('AUTH0_AUDIENCE')
+    }
+    token_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+    token_response = requests.post(token_url, data=token_payload, headers=token_headers)
+    token_response.raise_for_status()
+    tokens = token_response.json()
+
+    session['jwt_token'] = tokens['access_token']
+    session['id_token'] = tokens['id_token']
+
+    return redirect(url_for('home'))
 #endregion
 
 #region API Endpoints

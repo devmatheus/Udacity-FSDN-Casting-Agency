@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import json
-from flask import request, _request_ctx_stack
+from flask import request, _request_ctx_stack, session
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
@@ -45,6 +45,16 @@ def get_token_auth_header():
         }, 401)
     
     token = parts[1]
+    return token
+
+def get_token_session():
+    token = session.get('jwt_token')
+    if not token:
+        raise AuthError({
+            'code': 'authorization_header_missing',
+            'description': 'Authorization header is expected.'
+        }, 401)
+    
     return token
 
 def check_permissions(permission, payload):
@@ -132,9 +142,16 @@ def requires_auth(permission=''):
                 payload = {}
                 return f(payload, *args, **kwargs)
             
-            token = get_token_auth_header()
+            if not request.path.startswith('/api'):
+                token = get_token_session()
+            else:
+                token = get_token_auth_header()
+                
             payload = verify_decode_jwt(token)
-            check_permissions(permission, payload)
+
+            if permission:
+                check_permissions(permission, payload)
+
             return f(payload, *args, **kwargs)
 
         return wrapper

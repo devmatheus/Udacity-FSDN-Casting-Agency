@@ -6,13 +6,15 @@ class MovieCRUD extends EntityCRUD {
   }
 
   display(movies) {
+    if (!this.list) return;
+
     this.list.innerHTML = movies.map((movie) => `
         <tr>
           <td>${movie.title}</td>
           <td>${movie.release_date}</td>
           <td>
-            <button onclick="movieCRUD.update(${movie.id}, /* updatedData */)">Update</button>
-            <button onclick="movieCRUD.delete(${movie.id})">Delete</button>
+            <button onclick="crudInstance.edit(${movie.id})">Edit</button>
+            <button onclick="crudInstance.delete(${movie.id})">Delete</button>
           </td>
         </tr>
       `).join('');
@@ -20,8 +22,8 @@ class MovieCRUD extends EntityCRUD {
 
   getFormData() {
     return {
-      title: document.getElementById('movie-title').value,
-      release_date: document.getElementById('movie-release-date').value
+      title: document.getElementById('title').value,
+      release_date: document.getElementById('release_date').value
     };
   }
 }

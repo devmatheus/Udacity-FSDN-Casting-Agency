@@ -144,6 +144,28 @@ def get_movies(payload):
         'movies': [movie.format() for movie in movies]
     })
 
+@APP.route('/api/actors/<int:actor_id>', methods=['GET'])
+@requires_auth('get:actors')
+def get_actor(payload, actor_id):
+    actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
+    if actor is None:
+        abort(404)
+    return jsonify({
+        'success': True,
+        'data': actor.format()
+    })
+
+@APP.route('/api/movies/<int:movie_id>', methods=['GET'])
+@requires_auth('get:movies')
+def get_movie(payload, movie_id):
+    movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
+    if movie is None:
+        abort(404)
+    return jsonify({
+        'success': True,
+        'data': movie.format()
+    })
+
 @APP.route('/api/actors/<int:actor_id>', methods=['DELETE'])
 @requires_auth('delete:actors')
 def delete_actor(payload, actor_id):

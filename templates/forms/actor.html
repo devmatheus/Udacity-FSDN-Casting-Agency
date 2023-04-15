@@ -3,8 +3,8 @@
 {% block content %}
 <h2>{{ action }} Actor</h2>
 <form id="actor-form">
-    <input type="text" id="actor-name" placeholder="Enter actor name" required>
-    <textarea id="actor-bio" placeholder="Enter actor bio" required></textarea>
-    <button type="submit">{{ action }} Actor</button>
+    <input type="text" id="name" placeholder="Enter actor name" required class="form-control">
+    <textarea id="bio" placeholder="Enter actor bio" required class="form-control"></textarea>
+    <button type="submit" class="btn btn-success">{{ action }} Actor</button>
 </form>
 {% endblock %}

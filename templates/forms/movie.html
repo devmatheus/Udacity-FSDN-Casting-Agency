@@ -3,8 +3,8 @@
 {% block content %}
 <h2>{{ action }} Movie</h2>
 <form id="movie-form">
-    <input type="text" id="movie-title" placeholder="Enter movie title" required>
-    <input type="date" id="movie-release-date" required>
-    <button type="submit">{{ action }} Movie</button>
+    <input type="text" id="title" placeholder="Enter movie title" class="form-control" required>
+    <input type="date" id="release_date" required class="form-control">
+    <button type="submit" class="btn btn-success">{{ action }} Movie</button>
 </form>
 {% endblock %}

@@ -90,8 +90,8 @@ class Movie(db.Model):
     actors = db.relationship('Actor', secondary='movie_actor', backref=db.backref('movies', lazy=True))
 
     @property
-    def start_time_formatted(self):
-        return self.start_time.strftime('%d %B %Y %H:%M')
+    def release_date_formatted(self):
+        return self.release_date.strftime('%d %B %Y')
 
     def insert(self):
         db.session.add(self)
@@ -108,6 +108,7 @@ class Movie(db.Model):
         return {
             'id': self.id,
             'title': self.title,
-            'release_date': self.release_date.strftime('%d %B %Y'),
+            'release_date': self.release_date.strftime('%Y-%m-%d'),
+            'release_date_formatted': self.release_date_formatted,
             'actors': [actor.format() for actor in self.actors]
         }

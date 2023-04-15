@@ -14,11 +14,15 @@ function instantiateCRUDClasses() {
     return null;
 }
 
-const crudInstance = instantiateCRUDClasses();
+window.crudInstance = instantiateCRUDClasses();
 
 const editId = getIdFromUrl('actors') || getIdFromUrl('movies');
 if (editId) {
-    crudInstance.edit(editId);
+    crudInstance.fetchEntity(editId)
+    .then((entity) => {
+        crudInstance.populateForm(entity.data);
+    });
+        
 }
 
 const form = document.getElementById('actor-form') || document.getElementById('movie-form');
@@ -33,9 +37,9 @@ if (deleteButtons) {
     });
 }
 
-const actorTable = document.getElementById('actor-table') || document.getElementById('movie-table');
-if (actorTable) {
-    crudInstance.list(actorTable);
+const table = document.getElementById('actor-table') || document.getElementById('movie-table');
+if (table) {
+    crudInstance.list(table);
 }
 
 // ------------------ //

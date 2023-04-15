@@ -6,7 +6,7 @@ class EntityCRUD {
         this.prevPageButton = document.getElementById(prevPageId);
         this.nextPageButton = document.getElementById(nextPageId);
         this.page = 1;
-        
+
         if (this.form) {
             this.form.addEventListener('submit', (event) => this.create(event));
         }
@@ -18,7 +18,7 @@ class EntityCRUD {
         if (this.nextPageButton) {
             this.nextPageButton.addEventListener('click', () => this.nextPage());
         }
-        
+
         this.fetchAndDisplay();
     }
 
@@ -31,6 +31,12 @@ class EntityCRUD {
         const response = await fetch(`/api/${this.entityName}?page=${this.page}`);
         const data = await response.json();
         return data[this.entityName];
+    }
+
+    async fetchEntity(entityId) {
+        const response = await fetch(`/api/${this.entityName}/${entityId}`);
+        const data = await response.json();
+        return data;
     }
 
     display(entities) {
@@ -53,6 +59,19 @@ class EntityCRUD {
 
     getFormData() {
         // To be implemented in the specific entity class (e.g., ActorCRUD, MovieCRUD)
+    }
+
+    async edit(id) {
+        window.location.href = `/${this.entityName}/${id}/edit`;
+    }
+
+    populateForm(item) {
+        for (const key in item) {
+            const input = document.getElementById(key);
+            if (input) {
+                input.value = item[key];
+            }
+        }
     }
 
     async update(entityId, updatedData) {

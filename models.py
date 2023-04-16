@@ -25,33 +25,6 @@ def db_drop_and_create_all():
     # db.drop_all()
     db.create_all()
 
-    john = Actor(
-        name='John Doe',
-        bio='John Doe is an actor.'
-    )
-    john.insert()
-
-    jane = Actor(
-        name='Jane Doe',
-        bio='Jane Doe is an actor.'
-    )
-    jane.insert()
-
-    movie1 = Movie(
-        title='Movie 1',
-        release_date=date.today()
-    )
-    movie1.insert()
-    movie1.actors.append(john)
-
-    movie2 = Movie(
-        title='Movie 2',
-        release_date=date.today()
-    )
-    movie2.insert()
-    movie2.actors.append(john)
-    movie2.actors.append(jane)
-
 movie_actor = db.Table('movie_actor',
     db.Column('movie_id', db.Integer, db.ForeignKey('movie.id'), primary_key=True),
     db.Column('actor_id', db.Integer, db.ForeignKey('actor.id'), primary_key=True)

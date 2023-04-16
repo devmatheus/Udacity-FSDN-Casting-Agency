@@ -100,7 +100,7 @@ APP = create_app()
 @APP.route('/')
 @requires_auth()
 def index(payload):
-    return render_template('pages/home.html', token = payload['token'], permissions = payload['permissions'])
+    return render_template('pages/home.html', token = session.get('jwt_token'), permissions = payload['permissions'])
 
 @APP.route('/actors')
 @requires_auth()

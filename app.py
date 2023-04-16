@@ -159,7 +159,7 @@ def callback():
     code = request.args.get('code')
     token_url = f'https://{os.environ.get("AUTH0_DOMAIN")}/oauth/token'
     token_payload = {
-        'grant_type': 'client_credentials',
+        'grant_type': 'authorization_code',
         'client_id': os.environ.get('AUTH0_CLIENT_ID'),
         'client_secret': os.environ.get('AUTH0_CLIENT_SECRET'),
         'code': code,

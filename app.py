@@ -141,7 +141,7 @@ def movies(payload):
 
 @APP.route('/movies/create')
 @requires_auth('create:movies')
-def create_movie(payload):
+def create_movie_form(payload):
     '''
     Renders the movie form page
 
@@ -153,7 +153,7 @@ def create_movie(payload):
 
 @APP.route('/actors/create')
 @requires_auth('create:actors')
-def create_actor(payload):
+def create_actor_form(payload):
     '''
     Renders the actor form page
 

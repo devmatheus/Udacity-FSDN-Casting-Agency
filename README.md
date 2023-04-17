@@ -4,6 +4,10 @@
 
 This project is the final project for the Udacity Full Stack Web Development Nanodegree. It is a Casting Agency Project that allows users to view and add actors and movies to the database. The API is built using Flask and SQLAlchemy.
 
+## Motivation
+
+This project was created to demonstrate the skills learned in the Udacity Full Stack Web Development Nanodegree. The project is a RESTful API with endpoints for actors and movies, and a frontend application that interacts with the API.
+
 ## Authors
 - [**Matheus Machado**](matheusdev@me.com);
 
@@ -14,7 +18,7 @@ This project is the final project for the Udacity Full Stack Web Development Nan
 You can install the dependencies using the following command:
 
 ```sh
-$ pip install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 
 ### Running the server locally

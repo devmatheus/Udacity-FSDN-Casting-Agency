@@ -30,8 +30,9 @@ movie_actor = db.Table('movie_actor',
     db.Column('actor_id', db.Integer, db.ForeignKey('actor.id'), primary_key=True)
 )
 
-# Actors
-class Actor(db.Model):
+class BaseModel(db.Model):
+    __abstract__ = True
+
     id = Column(Integer, primary_key=True)
     name = Column(String)
     bio = Column(String, nullable=True)
@@ -47,6 +48,12 @@ class Actor(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+# Actors
+class Actor(BaseModel):
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    bio = Column(String, nullable=True)
+
     def format(self):
         return {
             'id': self.id,
@@ -55,7 +62,7 @@ class Actor(db.Model):
         }
     
 # Movies
-class Movie(db.Model):
+class Movie(BaseModel):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     release_date = Column(Date, nullable=True)
@@ -65,17 +72,6 @@ class Movie(db.Model):
     @property
     def release_date_formatted(self):
         return self.release_date.strftime('%d %B %Y')
-
-    def insert(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
 
     def format(self):
         return {

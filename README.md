@@ -8,6 +8,10 @@ This project is the final project for the Udacity Full Stack Web Development Nan
 
 This project was created to demonstrate the skills learned in the Udacity Full Stack Web Development Nanodegree. The project is a RESTful API with endpoints for actors and movies, and a frontend application that interacts with the API.
 
+## Endpoint
+
+The API is hosted at: https://fsnd-casting-agency.herokuapp.com
+
 ## Authors
 - [**Matheus Machado**](matheusdev@me.com);
 
@@ -202,6 +206,30 @@ The API will return three error types when requests fail:
   "success": true
 }
 ```
+
+### Heroku Deployment
+
+Follow these steps to deploy a Python application on Heroku:
+
+**Prerequisites**
+- Install [Git](https://git-scm.com/downloads)
+- Install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+- Create a [Heroku account](https://signup.heroku.com/)
+- Sign up for an [Auth0 account](https://auth0.com/signup)
+
+
+**Step 1: Set up Auth0**
+1. Log in to your Auth0 account.
+2. Create a new "Regular Web Application" client.
+3. Note down the "Domain", "Client ID", and "Client Secret" values.
+4. Set the "Allowed Callback URLs", "Allowed Logout URLs", and "Allowed Web Origins" as needed for your application.
+
+**Step 2: Set up Heroku and PostgreSQL**
+
+1. Create a new Heroku app.
+2. Execute the following command to create a new PostgreSQL database: `heroku addons:create heroku-postgresql --app <YOUR-APP-NAME>`.
+3. Set the environment variables in Heroku in the .env.example file
+4. Link your Heroku app to your GitHub repository. Now every time you push to GitHub, Heroku will automatically deploy your application. 
 
 ### Testing
 

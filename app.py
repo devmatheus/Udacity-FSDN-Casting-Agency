@@ -1,6 +1,15 @@
 import os
 import requests
-from flask import Flask, render_template, request, abort, jsonify, session, redirect, url_for
+from flask import (
+    Flask,
+    render_template,
+    request,
+    abort,
+    jsonify,
+    session,
+    redirect,
+    url_for
+)
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from urllib.parse import urlencode
@@ -100,42 +109,96 @@ APP = create_app()
 @APP.route('/')
 @requires_auth()
 def index(payload):
+    '''
+    Renders the home page
+
+    Returns:
+        HTML: The home page
+    '''
     return render_template('pages/home.html', token = session.get('jwt_token'), permissions = payload['permissions'])
 
 @APP.route('/actors')
 @requires_auth()
 def actors(payload):
+    '''
+    Renders the actors page
+
+    Returns:
+        HTML: The actors page
+    '''
     return render_template('pages/actors.html', permissions = payload['permissions'])
 
 @APP.route('/movies')
 @requires_auth()
 def movies(payload):
+    '''
+    Renders the movies page
+
+    Returns:
+        HTML: The movies page
+    '''
     return render_template('pages/movies.html', permissions = payload['permissions'])
 
 @APP.route('/movies/create')
 @requires_auth('create:movies')
-def create_movie_submission(payload):
+def create_movie(payload):
+    '''
+    Renders the movie form page
+
+    Returns:
+        HTML: The movie form page
+    '''
     actors = Actor.query.order_by(Actor.name).all()
     return render_template('forms/movie.html', action='Add', actors=actors, permissions = payload['permissions'])
 
 @APP.route('/actors/create')
 @requires_auth('create:actors')
-def create_actor_submission(payload):
+def create_actor(payload):
+    '''
+    Renders the actor form page
+
+    Returns:
+        HTML: The actor form page
+    '''
     return render_template('forms/actor.html', action='Add', permissions = payload['permissions'])
 
 @APP.route('/movies/<int:movie_id>/edit')
 @requires_auth('patch:movies')
-def edit_movie_submission(payload, movie_id):
+def edit_movie(payload, movie_id):
+    '''
+    Renders the movie form page
+
+    Parameters:
+        movie_id (int): The movie id
+    
+    Returns:
+        HTML: The movie form page
+    '''
     actors = Actor.query.order_by(Actor.name).all()
     return render_template('forms/movie.html', action='Edit', actors=actors, permissions = payload['permissions'])
 
 @APP.route('/actors/<int:actor_id>/edit')
 @requires_auth('patch:actors')
-def edit_actor_submission(payload, actor_id):
+def edit_actor(payload, actor_id):
+    '''
+    Renders the actor form page
+
+    Parameters:
+        actor_id (int): The actor id
+
+    Parameters:
+        actor_id (int): The actor id
+    '''
     return render_template('forms/actor.html', action='Edit', permissions = payload['permissions'])
 
 @APP.route('/login')
 def login():
+    '''
+    Redirects the user to the Auth0 login page
+
+    Returns:
+        Redirect: The Auth0 login page
+    '''
     base_url = f'https://{os.environ.get("AUTH0_DOMAIN")}/authorize'
     params = {
         'audience': os.environ.get('AUTH0_API_AUDIENCE'),
@@ -150,12 +213,24 @@ def login():
 
 @APP.route('/logout')
 def logout():
+    '''
+    Logs the user out of the application
+
+    Returns:
+        Redirect: The Auth0 logout page
+    '''
     session.clear()
 
     return redirect(f'https://{os.environ.get("AUTH0_DOMAIN")}/v2/logout?client_id={os.environ.get("AUTH0_CLIENT_ID")}&returnTo={os.environ.get("AUTH0_LOGOUT_CALLBACK_URL")}')
 
 @APP.route('/auth0-callback')
 def callback():
+    '''
+    Handles the Auth0 callback
+
+    Returns:
+        Redirect: The home page
+    '''
     code = request.args.get('code')
     token_url = f'https://{os.environ.get("AUTH0_DOMAIN")}/oauth/token'
     token_payload = {
@@ -181,6 +256,12 @@ def callback():
 @APP.route('/api/actors', methods=['GET'])
 @requires_auth('get:actors')
 def get_actors(payload):
+    '''
+    Gets a list of actors
+
+    Returns:
+        JSON: A list of actors
+    '''
     page = request.args.get('page', 1, type=int)
     page_size = request.args.get('page_size', 10, type=int)
 
@@ -200,6 +281,12 @@ def get_actors(payload):
 @APP.route('/api/movies', methods=['GET'])
 @requires_auth('get:movies')
 def get_movies(payload):
+    '''
+    Gets a list of movies
+
+    Returns:
+        JSON: A list of movies
+    '''
     page = request.args.get('page', 1, type=int)
     page_size = request.args.get('page_size', 10, type=int)
 
@@ -218,6 +305,15 @@ def get_movies(payload):
 @APP.route('/api/actors/<int:actor_id>', methods=['GET'])
 @requires_auth('get:actors')
 def get_actor(payload, actor_id):
+    '''
+    Gets an actor by id
+
+    Parameters:
+        actor_id (int): The actor id
+
+    Returns:
+        JSON: The actor
+    '''
     actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
     if actor is None:
         abort(404)
@@ -229,6 +325,15 @@ def get_actor(payload, actor_id):
 @APP.route('/api/movies/<int:movie_id>', methods=['GET'])
 @requires_auth('get:movies')
 def get_movie(payload, movie_id):
+    '''
+    Gets a movie by id
+
+    Parameters:
+        movie_id (int): The movie id
+
+    Returns:
+        JSON: The movie
+    '''
     movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
     if movie is None:
         abort(404)
@@ -240,6 +345,15 @@ def get_movie(payload, movie_id):
 @APP.route('/api/actors/<int:actor_id>', methods=['DELETE'])
 @requires_auth('delete:actors')
 def delete_actor(payload, actor_id):
+    '''
+    Deletes an actor by id
+
+    Parameters:
+        actor_id (int): The actor id
+
+    Returns:
+        JSON: The deleted actor id
+    '''
     actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
     if actor is None:
         abort(404)
@@ -252,6 +366,15 @@ def delete_actor(payload, actor_id):
 @APP.route('/api/movies/<int:movie_id>', methods=['DELETE'])
 @requires_auth('delete:movies')
 def delete_movie(payload, movie_id):
+    '''
+    Deletes a movie by id
+
+    Parameters:
+        movie_id (int): The movie id
+
+    Returns:
+        JSON: The deleted movie id
+    '''
     movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
     if movie is None:
         abort(404)
@@ -264,6 +387,12 @@ def delete_movie(payload, movie_id):
 @APP.route('/api/actors', methods=['POST'])
 @requires_auth('create:actors')
 def create_actor(payload):
+    '''
+    Creates an actor
+
+    Returns:
+        JSON: Success
+    '''
     actor = Actor(
         name=request.json.get('name'),
         bio=request.json.get('bio')
@@ -276,6 +405,12 @@ def create_actor(payload):
 @APP.route('/api/movies', methods=['POST'])
 @requires_auth('create:movies')
 def create_movie(payload):
+    '''
+    Creates a movie
+
+    Returns:
+        JSON: Success
+    '''
     movie = Movie(
         title=request.json.get('title'),
         release_date=request.json.get('release_date')
@@ -293,6 +428,15 @@ def create_movie(payload):
 @APP.route('/api/actors/<int:actor_id>', methods=['PATCH'])
 @requires_auth('patch:actors')
 def update_actor(payload, actor_id):
+    '''
+    Updates an actor by id
+
+    Parameters:
+        actor_id (int): The actor id
+
+    Returns:
+        JSON: Success
+    '''
     actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
     if actor is None:
         abort(404)
@@ -306,6 +450,15 @@ def update_actor(payload, actor_id):
 @APP.route('/api/movies/<int:movie_id>', methods=['PATCH'])
 @requires_auth('patch:movies')
 def update_movie(payload, movie_id):
+    '''
+    Updates a movie by id
+
+    Parameters:
+        movie_id (int): The movie id
+
+    Returns:
+        JSON: Success
+    '''
     movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
     if movie is None:
         abort(404)
